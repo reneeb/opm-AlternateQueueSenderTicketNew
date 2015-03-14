@@ -12,15 +12,15 @@ package Kernel::Output::HTML::OutputFilterAlternateQueueSenderTicketNew;
 use strict;
 use warnings;
 
+our @ObjectDependencies = qw(
+    Kernel::System::Web::Request
+);
+
 sub new {
     my ( $Type, %Param ) = @_;
 
     # allocate new hash for object
     my $Self = {};
-
-    for my $Object ( qw/ParamObject/ ) {
-        $Self->{$Object} = $Param{$Object} || die "Need $Object";
-    }
 
     bless( $Self, $Type );
 
@@ -30,8 +30,10 @@ sub new {
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    my $ParamObject = $Kernel::OM->Get('Kernel::System::Web::Request');
+
     # get template name
-    my $Templatename = $Self->{ParamObject}->GetParam( Param => 'Action' );
+    my $Templatename = $ParamObject->GetParam( Param => 'Action' );
 
     return 1 if !$Templatename;
     return 1 if !$Param{Templates}->{$Templatename};

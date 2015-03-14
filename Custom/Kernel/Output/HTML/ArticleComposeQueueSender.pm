@@ -13,8 +13,14 @@ use strict;
 use warnings;
 
 use Mail::Address;
-use Kernel::System::QueueSender;
-use Kernel::System::SystemAddress;
+
+our @ObjectDependencies = qw(
+    Kernel::System::QueueSender
+    Kernel::System::Queue
+    Kernel::System::User
+    Kernel::System::SystemAddress
+    Kernel::Output::HTML::Layout
+);
 
 sub new {
     my ( $Type, %Param ) = @_;
@@ -22,13 +28,6 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
-
-    for my $Object ( qw/QueueObject MainObject DBObject EncodeObject ConfigObject UserObject LogObject TimeObject LayoutObject/ ) {
-        $Self->{$Object} = $Param{$Object} || '';
-    }
-
-    $Self->{QueueSenderObject}   = Kernel::System::QueueSender->new( %{$Self} );
-    $Self->{SystemAddressObject} = Kernel::System::SystemAddress->new( %{$Self} );
 
     $Self->{UserID} = $Param{UserID};
 
@@ -46,7 +45,7 @@ sub Run {
 
     my %SenderList = $Self->Data( %Param );
     
-    my $LayoutObject = $Self->{LayoutObject};
+    my $LayoutObject = $Kernel::OM->Get('Kernel::Output::HTML::Layout');
 
     my $List = $LayoutObject->BuildSelection(
         Data         => \%SenderList,
@@ -92,20 +91,25 @@ sub Data {
 
     if ( $Param{QueueID} ) {
 
-        my %List  = $Self->{QueueSenderObject}->QueueSenderGet( QueueID => $Param{QueueID} );
-        my %Queue = $Self->{QueueObject}->QueueGet(
+        my $QueueSenderObject   = $Kernel::OM->Get('Kernel::System::QueueSender');
+        my $QueueObject         = $Kernel::OM->Get('Kernel::System::Queue');
+        my $UserObject          = $Kernel::OM->Get('Kernel::System::User');
+        my $SystemAddressObject = $Kernel::OM->Get('Kernel::System::SystemAddress');
+
+        my %List  = $QueueSenderObject->QueueSenderGet( QueueID => $Param{QueueID} );
+        my %Queue = $QueueObject->QueueGet(
             ID => $Param{QueueID},
         );
 
         my $QueueSystemAddressID = $Queue{SystemAddressID};
-        my $Template             = $Self->{QueueSenderObject}->QueueSenderTemplateGet(
+        my $Template             = $QueueSenderObject->QueueSenderTemplateGet(
             QueueID => $Param{QueueID},
         );
 
         my %IDAddressMap;
 
         if ( $Template ) {
-            my %UserData   = $Self->{UserObject}->GetUserData(
+            my %UserData = $UserObject->GetUserData(
                 UserID => $Self->{UserID},
             );
 
@@ -113,7 +117,7 @@ sub Data {
         }
 
         for my $ID ( keys %List, $Queue{SystemAddressID} ) {
-            my %Address = $Self->{SystemAddressObject}->SystemAddressGet(
+            my %Address = $SystemAddressObject->SystemAddressGet(
                 ID => $ID,
             );
 
