@@ -1,0 +1,12 @@
+=head1 NAME
+
+AlternateQueueSenderTicketNew
+
+=head1 DESCRIPTION
+
+This is an extension for L<AlternateQueueSender|http://opar.perl-services.de/dist/AlternateQueueSender>
+to show a dropdown in AgentTicketEmail to select a from address.
+
+=head1 AUTHOR
+
+Renee Baecker C<< <info@feature-addons.de> >>
