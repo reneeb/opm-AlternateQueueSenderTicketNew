@@ -31,6 +31,7 @@ sub new {
     $Self->{SystemAddressObject} = Kernel::System::SystemAddress->new( %{$Self} );
 
     $Self->{UserID} = $Param{UserID};
+    $Self->{Action} = $Param{Action};
 
     return $Self;
 }
@@ -38,11 +39,15 @@ sub new {
 sub Option {
     my ( $Self, %Param ) = @_;
 
+    return if !$Self->{Action} || $Self->{Action} ne 'AgentTicketEmail';
+
     return ('From');
 }
 
 sub Run {
     my ( $Self, %Param ) = @_;
+
+    return if !$Self->{Action} || $Self->{Action} ne 'AgentTicketEmail';
 
     my %SenderList = $Self->Data( %Param );
     
@@ -87,6 +92,8 @@ sub GetParamAJAX {
 
 sub Data {
     my ($Self, %Param) = @_;
+
+    return if !$Self->{Action} || $Self->{Action} ne 'AgentTicketEmail';
 
     my %SenderList;
 
