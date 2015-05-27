@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<otrs_package version="1.0">
+    <!-- GENERATED WITH OTRS::OPM::Maker::Command::sopm (1.29) -->
+    <Name>AlternateQueueSenderTicketNew</Name>
+    <Version>3.3.2</Version>
+    <Framework>3.3.x</Framework>
+    <PackageRequired Version="3.3.8">AlternateQueueSender</PackageRequired>
+    <Vendor>Perl-Services.de</Vendor>
+    <URL>http://www.perl-services.de</URL>
+    <Description Lang="de">Möglichkeit mehr als eine Absenderadresse pro Queue zu haben (in AgentEmailTicket)</Description>
+    <Description Lang="en">Have more than one sender address for a queue (in AgentEmailTicket)</Description>
+    <License>GNU AFFERO GENERAL PUBLIC LICENSE Version 3, November 2007</License>
+    <Filelist>
+        <File Permission="644" Location="Custom/Kernel/Output/HTML/ArticleComposeQueueSender.pm" />
+        <File Permission="644" Location="Custom/Kernel/Output/HTML/OutputFilterAlternateQueueSenderTicketNew.pm" />
+        <File Permission="644" Location="Kernel/Config/Files/AlternateQueueSenderTicketNew.xml" />
+        <File Permission="644" Location="doc/AlternateQueueSenderTicketNew.json" />
+        <File Permission="644" Location="doc/en/AlternateQueueSenderTicketNew.pod" />
+    </Filelist>
+</otrs_package>
