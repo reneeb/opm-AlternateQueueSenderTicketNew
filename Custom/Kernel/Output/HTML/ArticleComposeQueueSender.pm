@@ -58,6 +58,7 @@ sub Run {
         HTMLQuote    => 1,
         SelectedID   => $Param{From} || $Self->{SelectedAddress},
         AutoComplete => 'off',
+        Class        => 'Modernize',
     );
 
     $LayoutObject->Block(

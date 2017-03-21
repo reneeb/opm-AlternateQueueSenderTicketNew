@@ -1,13 +1,12 @@
 # --
-# Kernel/Output/HTML/OutputFilterAlternateQueueSenderTicketNew.pm
-# Copyright (C) 2015 Perl-Services.de, http://www.perl-services.de/
+# Copyright (C) 2015 - 2017 Perl-Services.de, http://www.perl-services.de/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::Output::HTML::OutputFilterAlternateQueueSenderTicketNew;
+package Kernel::Output::HTML::FilterContent::AlternateQueueSenderTicketNew;
 
 use strict;
 use warnings;
@@ -58,7 +57,7 @@ sub Run {
         }smx;
     }
 
-    return ${ $Param{Data} };
+    return 1;
 }
 
 1;

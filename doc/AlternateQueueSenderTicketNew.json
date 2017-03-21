@@ -1,6 +1,6 @@
 {
     "name": "AlternateQueueSenderTicketNew",
-    "version": "4.0.2",
+    "version": "5.0.1",
     "framework": [
         "4.0.x"
     ],
@@ -15,7 +15,7 @@
     },
     "requires" : {
         "package" : {
-            "AlternateQueueSender": "4.0.7"
+            "AlternateQueueSender": "5.0.1"
         }
     }
 }
