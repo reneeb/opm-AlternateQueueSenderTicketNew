@@ -1,13 +1,12 @@
 # --
-# Kernel/Output/HTML/ArticleComposeQueueSender.pm
-# Copyright (C) 2015 Perl-Services.de, http://perl-services.de
+# Copyright (C) 2015 - 2020 Perl-Services.de, http://perl-services.de
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file COPYING for license information (AGPL). If you
 # did not receive this file, see http://www.gnu.org/licenses/agpl.txt.
 # --
 
-package Kernel::Output::HTML::ArticleComposeQueueSender;
+package Kernel::Output::HTML::ArticleCompose::QueueSender;
 
 use strict;
 use warnings;
@@ -78,8 +77,8 @@ sub ArticleOption {
 
     my $Value = $Param{From};
 
-    $Value =~ s{&lt;}{<};
-    $Value =~ s{&gt;}{>};
+    $Value =~ s{&lt;}{<}xmsg;
+    $Value =~ s{&gt;}{>}xmsg;
 
     return From => $Value;
 }
@@ -99,6 +98,7 @@ sub Data {
 
     if ( $Param{QueueID} ) {
 
+        my $ConfigObject        = $Kernel::OM->Get('Kernel::Config');
         my $QueueSenderObject   = $Kernel::OM->Get('Kernel::System::QueueSender');
         my $QueueObject         = $Kernel::OM->Get('Kernel::System::Queue');
         my $UserObject          = $Kernel::OM->Get('Kernel::System::User');
@@ -114,14 +114,43 @@ sub Data {
             QueueID => $Param{QueueID},
         );
 
+        my $TemplateAddress = $QueueSenderObject->QueueSenderTemplateAddressGet(
+            QueueID => $Param{QueueID},
+        );
+
         my %IDAddressMap;
 
-        if ( $Template ) {
-            my %UserData = $UserObject->GetUserData(
+        for my $Tmpl ( $Template, $TemplateAddress ) {
+            next if !$Tmpl;
+
+            my $UserObject = $Kernel::OM->Get('Kernel::System::User');
+            my %UserData   = $UserObject->GetUserData(
                 UserID => $Self->{UserID},
             );
 
-            $Template =~ s{<OTRS_([^>]+)>}{$UserData{$1}}xsmg;
+            my %Filters = (
+                lc            => sub { lc $_[0] },
+                convert_chars => sub {
+                    my $Val = $_[0];
+                    my $Map = $ConfigObject->Get('Convert::Chars') || {};
+                    $Val =~ s{ $_ }{$Map->{$_}}g for sort keys %{$Map};
+                    $Val;
+                },
+            );
+
+            my $FiltersRE = join '|', sort keys %Filters;
+
+            $Tmpl =~ s{<OTRS_([^>]+)>}{$UserData{$1}}xsmg;
+            $Tmpl =~ s{<OTRS_([^>]+)>}{}xsmg;
+        }
+
+        if ( $TemplateAddress ) {
+            $SenderList{$TemplateAddress} = $TemplateAddress;
+
+            if ( $Template ) {
+                my $Label           = sprintf q~"%s" <%s>~, $Template, $TemplateAddress;
+                $SenderList{$Label} = $TemplateAddress;
+            }
         }
 
         for my $ID ( keys %List, $Queue{SystemAddressID} ) {
@@ -131,11 +160,11 @@ sub Data {
 
             next if !$Address{ValidID} || $Address{ValidID} != 1;
 
-            my $Address = $Address{Realname} ? (sprintf "%s &lt;%s&gt;", $Address{Realname}, $Address{Name}) : $Address{Name};
+            my $Address = $Address{Realname} ? (sprintf "%s <%s>", $Address{Realname}, $Address{Name}) : $Address{Name};
             $SenderList{$Address} = $Address;
 
             if ( $Template ) {
-                $Address =  sprintf "%s &lt;%s&gt;", $Template, $Address{Name};
+                $Address =  sprintf "%s <%s>", $Template, $Address{Name};
                 $SenderList{$Address} = $Address;
             }
 
@@ -144,7 +173,6 @@ sub Data {
 
         $Self->{SelectedAddress} = $IDAddressMap{ $QueueSystemAddressID };
     }
-
 
     return %SenderList;
 }

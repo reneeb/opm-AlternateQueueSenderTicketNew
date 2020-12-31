@@ -1,8 +1,8 @@
 {
     "name": "AlternateQueueSenderTicketNew",
-    "version": "5.0.1",
+    "version": "6.0.1",
     "framework": [
-        "4.0.x"
+        "6.0.x"
     ],
     "vendor": {
         "name":  "Perl-Services.de",
@@ -15,7 +15,7 @@
     },
     "requires" : {
         "package" : {
-            "AlternateQueueSender": "5.0.1"
+            "AlternateQueueSender": "6.0.2"
         }
     }
 }
